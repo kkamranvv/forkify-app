@@ -11,9 +11,9 @@ import paginationView from './views/paginationView.js';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-// if (module.hot) {
-//   module.hot.accept();
-// }
+ if (module.hot) {
+   module.hot.accept();
+ }
 
 const controlRecipes = async function () {
   try {
@@ -23,6 +23,7 @@ const controlRecipes = async function () {
     recipeView.renderSpinner();
 
     // 1) Loading Recipe
+    
     await model.loadRecipe(id);
     const { recipe } = model.state;
     989;
@@ -60,6 +61,7 @@ const controlSearchResults = async function () {
 };
 
 const controlPagination = function (goToPage) {
+  
   // 1) Render NEW results
   resultsView.render(model.getSearchResultsPage(goToPage));
 
