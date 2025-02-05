@@ -1,6 +1,6 @@
 import { async } from 'regenerator-runtime';
 
-import { API_URL, RES_PER_PAGE, KEY } from './config.js';
+import { API_URL, RES_PER_PAGE, KEY, RECIPE_PRICE } from './config.js';
 
 // import { getJSON, sendJSON } from './helpers.js';
 
@@ -15,6 +15,7 @@ export const state = {
     resultsPerPage: RES_PER_PAGE,
   },
   bookmarks: [],
+  cart: [],
 };
 
 const createRecipeObject = function (data) {
@@ -29,6 +30,7 @@ const createRecipeObject = function (data) {
     servings: recipe.servings,
     cookingTime: recipe.cooking_time,
     ingredients: recipe.ingredients,
+    price: RECIPE_PRICE,
     ...(recipe.key && { key: recipe.key }),
   };
 };
@@ -44,6 +46,9 @@ export const loadRecipe = async function (id) {
     if (state.bookmarks.some(bookmark => bookmark.id === id))
       state.recipe.bookmarked = true;
     else state.recipe.bookmarked = false;
+
+    if (state.cart.some(price => price.id === id)) state.recipe.added = true;
+    else state.recipe.added = false;
 
     console.log(state.recipe);
   } catch (err) {
@@ -124,6 +129,9 @@ export const removeBookmark = function (id) {
 const init = function () {
   const storage = localStorage.getItem('bookmarks');
   if (storage) state.bookmarks = JSON.parse(storage);
+
+  const storageCart = localStorage.getItem('cart'); // Load cart from local storage
+  if (storageCart) state.cart = JSON.parse(storageCart); // Initialize cart
 };
 
 init();
@@ -168,4 +176,27 @@ export const uploadRecipe = async function (newRecipe) {
   } catch (err) {
     throw err;
   }
+};
+
+const persistShoppingCart = function () {
+  localStorage.setItem('cart', JSON.stringify(state.cart));
+};
+
+export const addCart = function (recipe) {
+  state.cart.push(recipe);
+
+  if (recipe.id === state.recipe.id) state.recipe.added = true;
+
+  persistShoppingCart();
+};
+
+export const removeCart = function (id) {
+  const index = state.cart.findIndex(el => el.id === id);
+
+  state.cart.splice(index, 1);
+
+  // Mark current recipe as not bookmarked
+  if (id === state.recipe.id) state.recipe.added = false;
+
+  persistShoppingCart();
 };
