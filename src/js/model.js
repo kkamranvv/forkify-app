@@ -195,7 +195,7 @@ export const removeCart = function (id) {
 
   state.cart.splice(index, 1);
 
-  // Mark current recipe as not bookmarked
+  
   if (id === state.recipe.id) state.recipe.added = false;
 
   persistShoppingCart();
